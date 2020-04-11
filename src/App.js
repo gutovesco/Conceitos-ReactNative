@@ -4,26 +4,23 @@ import api from './services/api'
 
 export default function App(){
     const [repositories, setRepositories] = useState([])
-    const [likes, setLikes] = useState(0)
 
     useEffect(() => {
         api.get('repositories').then(response => {
-            const getLikes = response.data.map(item => 
-                setLikes(item.likes))
-            setRepositories(response.data)
-            console.log(response)
-        })
+            setRepositories(response.data)})
     }, [])
 
     async function handleLike(id){
-        const updateLikes = likes + 1
-        const response = await api.post(`repositories/${id}/like`, {
-            likes: updateLikes
-        })
-
-        const repository = response.data
         
-        setRepositories([...repositories, repository])
+        var response = await api.post(`repositories/${id}/like`)
+
+        const repositoryIndex = repositories.findIndex(repository => repository.id === id)
+
+        var repos = [...repositories]
+
+        repos[repositoryIndex] = response.data
+
+        setRepositories(repos)
     }
     
     return (
@@ -38,8 +35,8 @@ export default function App(){
             <Text style={styles.texto}>{item.title}</Text>
               
               {item.techs.map(array => 
-              <View style={styles.techsContainer}>
-                  <Text style={styles.tech}>{array}</Text>
+              <View key={array} style={styles.techsContainer}>
+                  <Text key={array} style={styles.tech}>{array}</Text>
               </View>
               )}
               
@@ -50,7 +47,7 @@ export default function App(){
                 // Remember to replace "1" below with repository ID: {`repository-likes-${repository.id}`}
                 testID={`repository-likes-${item.id}`}
               >
-                {item.likes} curtidas
+                {item.likes} {item.likes === 1 ? 'curtida' : 'curtidas'}
               </Text>
               
             </View>
@@ -64,6 +61,7 @@ export default function App(){
           </TouchableOpacity>
           </View>
         )}/>
+
         </SafeAreaView>
       </>
 )
@@ -73,20 +71,25 @@ const styles = StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: "#7159c1",
+      borderRadius: 15
     },
     repositoryContainer: {
       marginBottom: 15,
       marginHorizontal: 15,
       backgroundColor: "#fff",
+      borderRadius: 15,
       padding: 20,
+      borderRadius: 15
     },
     repository: {
       fontSize: 32,
       fontWeight: "bold",
+      borderRadius: 15
     },
     techsContainer: {
       flexDirection: "row",
       marginTop: 10,
+      borderRadius: 15
     },
     tech: {
       fontSize: 12,
@@ -96,11 +99,13 @@ const styles = StyleSheet.create({
       paddingHorizontal: 10,
       paddingVertical: 5,
       color: "#fff",
+      borderRadius: 15
     },
     likesContainer: {
       marginTop: 15,
       flexDirection: "row",
       justifyContent: "space-between",
+      borderRadius: 15
     },
     likeText: {
       fontSize: 14,
@@ -109,6 +114,7 @@ const styles = StyleSheet.create({
     },
     button: {
       marginTop: 10,
+      borderRadius: 10
     },
     buttonText: {
       fontSize: 14,
